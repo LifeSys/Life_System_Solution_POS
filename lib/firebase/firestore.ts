@@ -158,6 +158,7 @@ export interface Order {
   tableId?: string // Optional for takeout
   tableNumber?: number // Optional for takeout
   orderType: "dine_in" | "takeout"
+  items: OrderItem[] // Legacy/active embedded items used by current POS screens
   total: number
   status: "open" | "preparing" | "ready" | "delivered" | "paid" | "cancelled"
   paymentStatus: "pending" | "paid"
