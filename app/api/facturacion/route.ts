@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server"
 import type { EmitirComprobanteRequest, ItemComprobanteApi } from "@/lib/models/comprobante"
 
 // Estas variables viven SOLO en el servidor (Railway/Vercel env vars), nunca llegan al navegador.
-const BASE_URL = process.env.SUNAT_API_BASE_URL // ej: https://tu-api-sunat.up.railway.app/api/v1
-const API_KEY = process.env.SUNAT_API_KEY
-const API_SECRET = process.env.SUNAT_API_SECRET
+const BASE_URL = process.env.https://lifesystemsolution-api-sunat-production.up.railway.app/api/v1 // ej: https://tu-api-sunat.up.railway.app/api/v1
+const API_KEY = process.env.LdcrbxyEFwOBaddKUSiXzRB6rjwB2nksVqclDW613D2VFVuhepXSYBLjiPCNeNsW
+const API_SECRET = process.env.cd349579200ab484e27e01e85825d6e16c29cc90afe63cc7a072ec5c1c012e27
 
 const ENDPOINT_POR_TIPO: Record<string, string> = {
   BOLETA: "boletas",
