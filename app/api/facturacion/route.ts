@@ -36,6 +36,12 @@ async function obtenerSerieActiva(tipo: "BOLETA" | "FACTURA"): Promise<string> {
   })
   const text = await res.text()
 
+  console.log("====================================")
+  console.log("CONSULTANDO SERIES")
+  console.log("TIPO:", tipo)
+  console.log("STATUS:", res.status)
+  console.log("BODY:", text)
+  console.log("====================================")
   let json = null
   try {
     json = JSON.parse(text)
@@ -148,6 +154,13 @@ export async function POST(req: NextRequest) {
 
     const text = await res.text()
 
+    console.log("====================================")
+    console.log("TIPO:", body.tipo)
+    console.log("ENDPOINT:", endpoint)
+    console.log("STATUS:", res.status)
+    console.log("BODY:", text)
+    console.log("====================================")
+
     let json = null
     try {
       json = JSON.parse(text)
@@ -201,6 +214,11 @@ export async function GET(req: NextRequest) {
       headers: { "X-Api-Key": API_KEY, "X-Api-Secret": API_SECRET },
     })
     const text = await res.text()
+
+    console.log("====================================")
+    console.log("GET STATUS:", res.status)
+    console.log("GET BODY:", text)
+    console.log("====================================")
 
     let json = null
     try {
