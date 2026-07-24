@@ -176,8 +176,9 @@ export default function DashboardPage() {
       FACTURA: { cantidad: 0, total: 0 },
     }
     for (const c of filteredComprobantes) {
-      base[c.tipo].cantidad += 1
-      base[c.tipo].total += c.total || 0
+      if (!base[c.tipo as keyof typeof base]) continue // dato corrupto o de prueba: se ignora en el resumen
+      base[c.tipo as keyof typeof base].cantidad += 1
+      base[c.tipo as keyof typeof base].total += c.total || 0
     }
     return base
   }, [filteredComprobantes])

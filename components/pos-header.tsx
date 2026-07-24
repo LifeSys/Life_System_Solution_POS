@@ -99,20 +99,12 @@ export function POSHeader({ title }: POSHeaderProps) {
             </Link>
           )}
           {isCajero && (
-            <>
-              <Link href="/caja">
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <CreditCard className="h-4 w-4" />
-                  Caja
-                </Button>
-              </Link>
-              <Link href="/comprobantes">
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <Receipt className="h-4 w-4" />
-                  Comprobantes
-                </Button>
-              </Link>
-            </>
+            <Link href="/caja">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <CreditCard className="h-4 w-4" />
+                Caja
+              </Button>
+            </Link>
           )}
           {isAdmin && (
             <>
@@ -120,12 +112,6 @@ export function POSHeader({ title }: POSHeaderProps) {
                 <Button variant="ghost" size="sm" className="gap-2">
                   <Settings className="h-4 w-4" />
                   Admin
-                </Button>
-              </Link>
-              <Link href="/comprobantes">
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <Receipt className="h-4 w-4" />
-                  Comprobantes
                 </Button>
               </Link>
               <Link href="/inventario">
@@ -141,6 +127,14 @@ export function POSHeader({ title }: POSHeaderProps) {
                 </Button>
               </Link>
             </>
+          )}
+          {(isCajero || isAdmin) && (
+            <Link href="/comprobantes">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <Receipt className="h-4 w-4" />
+                Comprobantes
+              </Button>
+            </Link>
           )}
         </nav>
 
@@ -195,20 +189,12 @@ export function POSHeader({ title }: POSHeaderProps) {
                   </DropdownMenuItem>
                 )}
                 {isCajero && (
-                  <>
-                    <DropdownMenuItem asChild>
-                      <Link href="/caja" className="gap-2">
-                        <CreditCard className="h-4 w-4" />
-                        Caja
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/comprobantes" className="gap-2">
-                        <Receipt className="h-4 w-4" />
-                        Comprobantes
-                      </Link>
-                    </DropdownMenuItem>
-                  </>
+                  <DropdownMenuItem asChild>
+                    <Link href="/caja" className="gap-2">
+                      <CreditCard className="h-4 w-4" />
+                      Caja
+                    </Link>
+                  </DropdownMenuItem>
                 )}
                 {isAdmin && (
                   <>
@@ -216,12 +202,6 @@ export function POSHeader({ title }: POSHeaderProps) {
                       <Link href="/admin" className="gap-2">
                         <Settings className="h-4 w-4" />
                         Admin
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/comprobantes" className="gap-2">
-                        <Receipt className="h-4 w-4" />
-                        Comprobantes
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -237,6 +217,14 @@ export function POSHeader({ title }: POSHeaderProps) {
                       </Link>
                     </DropdownMenuItem>
                   </>
+                )}
+                {(isCajero || isAdmin) && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/comprobantes" className="gap-2">
+                      <Receipt className="h-4 w-4" />
+                      Comprobantes
+                    </Link>
+                  </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
               </div>
