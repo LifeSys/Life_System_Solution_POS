@@ -31,6 +31,8 @@ interface AuthContextType {
   // PIN-based operational user
   user: User | null
   store: Store | null
+  currentStore: Store | null
+  storeId: string | null
   currentStoreId: string | null
   availableStores: Store[]
   allAccessibleStores: Store[] // All stores user can access (for admin_global)
@@ -353,6 +355,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     user,
     store,
+    currentStore: store,
+    storeId: currentStoreId,
     currentStoreId,
     availableStores,
     allAccessibleStores,

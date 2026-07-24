@@ -21,7 +21,7 @@ export function calculateItemTotal(price: any, quantity: any): string {
  * Converts a date to Peru timezone (America/Lima)
  * This is used for display and grouping purposes only
  */
-export function toPeruDate(date: Date | Timestamp | { toDate: () => Date } | null | undefined): Date {
+export function toPeruDate(date: Date | Timestamp | string | { toDate: () => Date } | null | undefined): Date {
   if (!date) return new Date()
   
   let d: Date
@@ -39,21 +39,21 @@ export function toPeruDate(date: Date | Timestamp | { toDate: () => Date } | nul
 /**
  * Formats a date to Peru locale date string
  */
-export function formatPeruDate(date: Date | Timestamp | { toDate: () => Date } | null | undefined): string {
+export function formatPeruDate(date: Date | Timestamp | string | { toDate: () => Date } | null | undefined): string {
   return toPeruDate(date).toLocaleDateString("es-PE")
 }
 
 /**
  * Formats a date to Peru locale time string
  */
-export function formatPeruTime(date: Date | Timestamp | { toDate: () => Date } | null | undefined): string {
+export function formatPeruTime(date: Date | Timestamp | string | { toDate: () => Date } | null | undefined): string {
   return toPeruDate(date).toLocaleTimeString("es-PE")
 }
 
 /**
  * Gets the day key (YYYY-MM-DD) for grouping orders in Peru timezone
  */
-export function getPeruDayKey(date: Date | Timestamp | { toDate: () => Date } | null | undefined): string {
+export function getPeruDayKey(date: Date | Timestamp | string | { toDate: () => Date } | null | undefined): string {
   const peruDate = toPeruDate(date)
   const year = peruDate.getFullYear()
   const month = String(peruDate.getMonth() + 1).padStart(2, '0')
@@ -99,7 +99,7 @@ export function normalizeVariantName(variant: string): string {
 /**
  * Formats a date and time as professional receipt format (DD/MM/YYYY HH:MM AM/PM)
  */
-export function formatReceiptDateTime(date: Date | { toDate: () => Date } | null | undefined): string {
+export function formatReceiptDateTime(date: Date | Timestamp | string | { toDate: () => Date } | null | undefined): string {
   try {
     const peruDate = toPeruDate(date)
     const dateStr = peruDate.toLocaleDateString("es-PE", { year: "numeric", month: "2-digit", day: "2-digit" })

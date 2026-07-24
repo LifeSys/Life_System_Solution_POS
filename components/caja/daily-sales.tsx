@@ -18,7 +18,7 @@ import {
   Clock,
   DollarSign,
 } from "lucide-react"
-import type { Order } from "@/lib/firebase/firestore"
+import type { Order, Store } from "@/lib/firebase/firestore"
 import { collections, recalculateCashRegisterAfterOrderDeletion, getDocument } from "@/lib/firebase/firestore"
 import { formatPeruTime, getPeruDayKey, toPeruDate, calculateItemTotal } from "@/lib/utils"
 import { cn } from "@/lib/utils"
@@ -27,6 +27,7 @@ import { db } from "@/lib/firebase/config"
 
 interface DailySalesProps {
   orders: Order[]
+  store?: Store | null
 }
 
 export function DailySales({ orders }: DailySalesProps) {
@@ -128,7 +129,7 @@ export function DailySales({ orders }: DailySalesProps) {
       }
 
       // 1. Get the closure to retrieve initialAmount
-      const cashClosure = await getDocument(collections.cashRegister, order.cashClosureId)
+      const cashClosure = await getDocument<{ initialAmount?: number }>(collections.cashRegister, order.cashClosureId)
       const initialAmount = cashClosure?.initialAmount || 0
 
       // 2. Delete the order using deleteDoc

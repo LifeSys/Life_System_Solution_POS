@@ -1,4 +1,4 @@
-# Financial API Reference - MultiPizza POS
+# Financial API Reference - LifeSystemSolution POS
 
 **Purpose**: Single source of truth for all financial function usage  
 **Status**: Production Ready  

@@ -1,4 +1,4 @@
-# Lógica Financiera REAL del POS MultiPizza
+# Lógica Financiera REAL del POS LifeSystemSolution
 
 ## Descripción General
 

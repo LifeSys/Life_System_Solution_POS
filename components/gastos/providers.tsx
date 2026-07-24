@@ -61,6 +61,7 @@ export function ProvidersManagement() {
     setLoading(true)
     try {
       const newProviderId = await registerProvider(store.id!, {
+        storeId: store.id!,
         name: formData.name,
         contact: formData.contact,
         phone: formData.phone,

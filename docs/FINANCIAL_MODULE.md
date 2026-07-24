@@ -2,7 +2,7 @@
 
 ### Overview
 
-The Financial Module is a comprehensive system for managing expenses, cash boxes, and providers within the MultiPizza POS system. It integrates seamlessly with the existing architecture and provides real-time financial visibility.
+The Financial Module is a comprehensive system for managing expenses, cash boxes, and providers within the LifeSystemSolution POS system. It integrates seamlessly with the existing architecture and provides real-time financial visibility.
 
 ---
 

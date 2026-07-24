@@ -1,8 +1,8 @@
-# Sistema Profesional de Impresión para MultiPizza POS
+# Sistema Profesional de Impresión para LifeSystemSolution POS
 
 ## Resumen de la Implementación
 
-Se ha desarrollado un **sistema integral de impresión profesional** para el sistema MultiPizza POS que incluye soporte completo para impresoras térmicas de 80mm, configuración personalizable, gestión de estados y vistas previas avanzadas.
+Se ha desarrollado un **sistema integral de impresión profesional** para el sistema LifeSystemSolution POS que incluye soporte completo para impresoras térmicas de 80mm, configuración personalizable, gestión de estados y vistas previas avanzadas.
 
 ### Estadísticas del Proyecto
 - **Archivos Creados**: 9 nuevos archivos
@@ -71,7 +71,7 @@ Componente profesional de impresión:
 ```tsx
 <ReceiptPrinter
   elements={receiptElements}
-  storeName="MultiPizza"
+  storeName="LifeSystemSolution"
   storeInfo="Local 01"
   onPrint={() => console.log("Imprimido")}
 />
@@ -363,7 +363,7 @@ El sistema incluye 4 perfiles predefinidos:
 
 ## Conclusión
 
-El nuevo sistema de impresión proporciona una solución **profesional, configurable y fácil de usar** para la impresión de recibos y tickets en MultiPizza POS. Con más de 2,700 líneas de código nuevo en 9 archivos, incluye:
+El nuevo sistema de impresión proporciona una solución **profesional, configurable y fácil de usar** para la impresión de recibos y tickets en LifeSystemSolution POS. Con más de 2,700 líneas de código nuevo en 9 archivos, incluye:
 
 - ✅ Soporte completo para impresoras térmicas de 80mm
 - ✅ Plantillas profesionales personalizables

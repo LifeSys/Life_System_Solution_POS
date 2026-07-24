@@ -1,4 +1,4 @@
-# MultiPizza ERP/POS System - Master Architectural Plan
+# LifeSystemSolution ERP/POS System - Master Architectural Plan
 
 ## Executive Summary
 

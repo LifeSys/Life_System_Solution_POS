@@ -8,12 +8,12 @@ When a user logs in with Firebase (email/password), the system automatically loa
 
 ### 1. Firebase Authentication
 ```
-User enters: pascana@multipizza.com / password
+User enters: pascana@lifesystemsolution.com / password
 ↓
 Firebase Auth succeeds
 ↓
 firebaseUser.uid = "ABC123..." 
-firebaseUser.email = "pascana@multipizza.com"
+firebaseUser.email = "pascana@lifesystemsolution.com"
 ```
 
 ### 2. Store Discovery
@@ -26,7 +26,7 @@ Context listener:
 ↓
 Searches stores collection for matches on:
   firebaseUid === "ABC123..." OR
-  firebaseEmail === "pascana@multipizza.com"
+  firebaseEmail === "pascana@lifesystemsolution.com"
 ```
 
 ### 3. Auto-Load Stores
@@ -50,7 +50,7 @@ If firebaseAccessibleStores.length === 0:
 ### Step 1: Get Firebase UID
 
 Go to Firebase Console → Authentication → Users:
-- Find the user (e.g., pascana@multipizza.com)
+- Find the user (e.g., pascana@lifesystemsolution.com)
 - Copy their UID
 
 Example: `HjK8nL0pQ9vXyZ2aB3cD4e5F6g7H8i9J`
@@ -67,7 +67,7 @@ stores/DOC_ID
   active: true
   createdAt: Timestamp
   firebaseUid: "HjK8nL0pQ9vXyZ2aB3cD4e5F6g7H8i9J"      ← ADD THIS
-  firebaseEmail: "pascana@multipizza.com"               ← ADD THIS
+  firebaseEmail: "pascana@lifesystemsolution.com"               ← ADD THIS
 }
 ```
 
@@ -82,7 +82,7 @@ db.collection('stores').doc('PSC001').update({
 **Option B: By Email**
 ```javascript
 db.collection('stores').doc('PSC001').update({
-  firebaseEmail: "pascana@multipizza.com"
+  firebaseEmail: "pascana@lifesystemsolution.com"
 })
 ```
 
@@ -90,7 +90,7 @@ db.collection('stores').doc('PSC001').update({
 ```javascript
 db.collection('stores').doc('PSC001').update({
   firebaseUid: "HjK8nL0pQ9vXyZ2aB3cD4e5F6g7H8i9J",
-  firebaseEmail: "pascana@multipizza.com"
+  firebaseEmail: "pascana@lifesystemsolution.com"
 })
 ```
 
@@ -98,7 +98,7 @@ db.collection('stores').doc('PSC001').update({
 
 1. Open the app
 2. Navigate to login page
-3. Enter: pascana@multipizza.com / password
+3. Enter: pascana@lifesystemsolution.com / password
 4. Verify that:
    - Stores load automatically
    - If only 1 store: it's pre-selected
@@ -109,7 +109,7 @@ db.collection('stores').doc('PSC001').update({
 
 ### Single Store Setup
 
-User: huanuco@multipizza.com
+User: huanuco@lifesystemsolution.com
 Firebase UID: `aBcDeF1234GhIjK5678LmNoPqRsT9uVw`
 
 **Store Document:**
@@ -120,7 +120,7 @@ stores/HUA001
   code: "HUA001",
   active: true,
   firebaseUid: "aBcDeF1234GhIjK5678LmNoPqRsT9uVw",
-  firebaseEmail: "huanuco@multipizza.com"
+  firebaseEmail: "huanuco@lifesystemsolution.com"
 }
 ```
 
@@ -133,7 +133,7 @@ stores/HUA001
 
 ### Multi-Store Setup (admin_global)
 
-User: global_admin@multipizza.com
+User: global_admin@lifesystemsolution.com
 Firebase UID: `xYz987vUtSwRqPoNmLkJiHgFeDcBaA123`
 
 **Store Documents:**
@@ -227,13 +227,13 @@ const stores = await getStoresByFirebaseCredentials(
 // Also works:
 const stores = await getStoresByFirebaseCredentials(
   undefined,
-  "pascana@multipizza.com"
+  "pascana@lifesystemsolution.com"
 )
 
 // Both:
 const stores = await getStoresByFirebaseCredentials(
   "HjK8nL0pQ9vXyZ2aB3cD4e5F6g7H8i9J",
-  "pascana@multipizza.com"
+  "pascana@lifesystemsolution.com"
 )
 ```
 

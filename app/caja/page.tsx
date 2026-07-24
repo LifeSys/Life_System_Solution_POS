@@ -309,6 +309,7 @@ export default function CajaPage() {
         idx === itemIndex ? { ...item, quantity: newQuantity } : item
       )
       
+      if (!selectedOrder.id) return
       await updateOpenOrderItems(
         selectedOrder.id,
         updatedItems,
@@ -362,6 +363,7 @@ export default function CajaPage() {
       const itemIndex = itemToDelete.index
       const item = itemToDelete.item
 
+      if (!selectedOrder.id) return
       await cancelOrderItems(
         selectedOrder.id,
         [item.id || `legacy:${itemIndex}`],
@@ -489,7 +491,7 @@ export default function CajaPage() {
     const [year, month] = selectedMonthFilter.split("-")
     
     return closedRegisters.filter(register => {
-      const closedDate = register.closedAt ? (register.closedAt instanceof Date ? register.closedAt : register.closedAt.toDate?.() || new Date(register.closedAt)) : null
+      const closedDate = register.closedAt ? toPeruDate(register.closedAt) : null
       if (!closedDate) return false
       
       return closedDate.getFullYear() === parseInt(year) && 
@@ -501,7 +503,7 @@ export default function CajaPage() {
   const availableMonths = useMemo(() => {
     const months = new Set<string>()
     closedRegisters.forEach(register => {
-      const closedDate = register.closedAt ? (register.closedAt instanceof Date ? register.closedAt : register.closedAt.toDate?.() || new Date(register.closedAt)) : null
+      const closedDate = register.closedAt ? toPeruDate(register.closedAt) : null
       if (closedDate) {
         const year = closedDate.getFullYear()
         const month = (closedDate.getMonth() + 1).toString().padStart(2, "0")
@@ -938,8 +940,8 @@ export default function CajaPage() {
                 <Button
                   onClick={() => {
                     if (!lastProcessedOrder) return
-                    const html = generateOrderReceipt(lastProcessedOrder, currentStore?.name || "")
-                    const printHtml = generatePrintHTML(html)
+                    const receiptElements = generateOrderReceipt(lastProcessedOrder, currentStore || undefined)
+                    const printHtml = generatePrintHTML(receiptElements)
                     
                     if (printSettings?.useThermalPrinter) {
                       const printWindow = window.open("", "_blank")
@@ -951,7 +953,7 @@ export default function CajaPage() {
                     } else {
                       const printWindow = window.open("", "_blank")
                       if (printWindow) {
-                        printWindow.document.write(generateOrderReceipt(lastProcessedOrder, currentStore?.name || ""))
+                        printWindow.document.write(printHtml)
                         printWindow.document.close()
                         printWindow.print()
                       }
@@ -1407,7 +1409,7 @@ export default function CajaPage() {
               className="flex-1 h-10 gap-2" 
               onClick={() => {
                 if (lastProcessedOrder && printSettings) {
-                  const receiptElements = generateOrderReceipt(lastProcessedOrder, currentStore)
+                  const receiptElements = generateOrderReceipt(lastProcessedOrder, currentStore || undefined)
                   const html = generatePrintHTML(receiptElements, currentStore?.name, currentStore?.code)
                   const printWindow = window.open("", "_blank")
                   if (printWindow) {
