@@ -1,13 +1,10 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { AuthProvider } from '@/contexts/auth-context'
 import { SessionRestorer } from '@/components/auth/session-restorer'
 import { POSProvider } from '@/contexts/pos-context'
 import './globals.css'
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
 export const metadata: Metadata = {
   title: 'LifeSystemSolution POS',
@@ -41,7 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased min-h-screen bg-background text-foreground`}>
+      <body className="font-sans antialiased min-h-screen bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem storageKey="theme">
           <AuthProvider>
             <SessionRestorer />

@@ -1,5 +1,5 @@
 # Análisis Completo de Arquitectura, Autenticación y Seguridad
-## MultiPizza POS System
+## LifeSystemSolution POS System
 
 **Fecha**: Mayo 7, 2026  
 **Análisis realizado por**: v0 Auditoría de Seguridad  
@@ -9,7 +9,7 @@
 
 ## RESUMEN EJECUTIVO
 
-El sistema MultiPizza es una aplicación POS (Point of Sale) multi-tenant construida con:
+El sistema LifeSystemSolution es una aplicación POS (Point of Sale) multi-tenant construida con:
 - **Frontend**: Next.js 16 con React 19
 - **Backend**: Firebase (Firestore + Authentication)
 - **Autenticación**: Dual-layer (Firebase Auth + PIN-based operational access)
@@ -158,9 +158,9 @@ El sistema implementa **DOS capas de autenticación independientes**:
 // lib/firebase/config.ts
 const firebaseConfig = {
   apiKey: "AIzaSyDZVwR59Tfg6UNrH13PHftuodIx2Zyyd28",
-  authDomain: "multipizza-core.firebaseapp.com",
-  projectId: "multipizza-core",
-  storageBucket: "multipizza-core.firebasestorage.app",
+  authDomain: "lifesystemsolution-core.firebaseapp.com",
+  projectId: "lifesystemsolution-core",
+  storageBucket: "lifesystemsolution-core.firebasestorage.app",
   messagingSenderId: "475852672554",
   appId: "1:475852672554:web:16ef2e753ed4c6a844bd53"
 }
@@ -763,7 +763,7 @@ This is **adequately protected** assuming:
 ### 5.1 Collections Structure
 
 ```firestore
-multipizza-core/
+lifesystemsolution-core/
 ├── stores/                    # Store metadata
 │  └─ {storeId}/
 │     ├─ name: string
@@ -1240,9 +1240,9 @@ logDataModification(collection, docId, before, after)
 
 const firebaseConfig = {
   apiKey: "AIzaSyDZVwR59Tfg6UNrH13PHftuodIx2Zyyd28",  // ⚠️ PUBLIC
-  authDomain: "multipizza-core.firebaseapp.com",
-  projectId: "multipizza-core",                        // ⚠️ PUBLIC
-  storageBucket: "multipizza-core.firebasestorage.app",
+  authDomain: "lifesystemsolution-core.firebaseapp.com",
+  projectId: "lifesystemsolution-core",                        // ⚠️ PUBLIC
+  storageBucket: "lifesystemsolution-core.firebasestorage.app",
   messagingSenderId: "475852672554",
   appId: "1:475852672554:web:16ef2e753ed4c6a844bd53" // ⚠️ PUBLIC
 }
@@ -1835,6 +1835,6 @@ SEMANA 4: 2FA + Security Headers
 ---
 
 **Análisis completado**: Mayo 7, 2026  
-**Sistema**: MultiPizza POS  
+**Sistema**: LifeSystemSolution POS  
 **Versión**: Production Ready (with critical fixes needed)
 

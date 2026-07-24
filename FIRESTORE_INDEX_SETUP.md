@@ -16,7 +16,7 @@ The Caja module requires a composite index for the `safe_box_movements` collecti
 #### Option 1: Via Firebase Console (Recommended)
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Select your project (multipizza-core)
+2. Select your project (lifesystemsolution-core)
 3. Navigate to **Firestore Database** > **Indexes** > **Composite indexes**
 4. Click **Create Index**
 5. Fill in:

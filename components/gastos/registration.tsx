@@ -73,6 +73,7 @@ export function GastosRegistration() {
       await registerExpenseTransaction(
         store.id!,
         {
+          storeId: store.id!,
           amount: parseFloat(formData.amount),
           category: formData.category,
           description: formData.description,

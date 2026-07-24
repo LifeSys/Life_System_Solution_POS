@@ -161,7 +161,7 @@ export default function DashboardPage() {
   // Comprobantes filtrados por el mismo rango de fechas que el resto del dashboard
   const filteredComprobantes = useMemo(() => {
     return comprobantes.filter((c) => {
-      const fecha = c.createdAt?.toDate?.()
+      const fecha = c.createdAt
       if (!fecha) return false
       const peruFecha = toPeruDate(fecha)
       return peruFecha >= startDate && peruFecha <= endDate

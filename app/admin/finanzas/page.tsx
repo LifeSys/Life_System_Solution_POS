@@ -42,7 +42,8 @@ export interface FinancialMovementDisplay {
   origin?: string
   userId: string
   userName: string
-  timestamp: any
+  timestamp?: Date | { toDate: () => Date } | string
+  createdAt?: Date | { toDate: () => Date } | string
   source?: string
 }
 
@@ -94,7 +95,7 @@ export default function FinanzasPage() {
   const cashSummary = useMemo(() => {
     let cashBalance = 0
     let safeBoxBalance = safeBox?.currentBalance || 0
-    let todayMovements = []
+    let todayMovements: FinancialMovementDisplay[] = []
 
     // Get today's movements
     const today = new Date()
@@ -102,7 +103,7 @@ export default function FinanzasPage() {
 
     movements.forEach(m => {
       const timestamp = m.timestamp || m.createdAt
-      const movDate = timestamp instanceof Date ? timestamp : timestamp.toDate?.() || new Date(timestamp)
+      const movDate = timestamp instanceof Date ? timestamp : typeof timestamp === "string" ? new Date(timestamp) : timestamp?.toDate?.() || new Date()
       movDate.setHours(0, 0, 0, 0)
 
       if (movDate.getTime() === today.getTime()) {
@@ -161,14 +162,13 @@ export default function FinanzasPage() {
 
       filtered = filtered.filter(m => {
         const timestamp = m.timestamp || m.createdAt
-        const movDate = timestamp instanceof Date ? timestamp : timestamp.toDate?.() || new Date(timestamp)
+        const movDate = timestamp instanceof Date ? timestamp : typeof timestamp === "string" ? new Date(timestamp) : timestamp?.toDate?.() || new Date()
         return movDate >= startDate
       })
     }
 
     // Type filter - handle both old (deposit/expense) and new (entrada/salida) formats
     if (typeFilter !== "all") {
-      const movType = getNormalizedType(m)
       filtered = filtered.filter(m => {
         const type = getNormalizedType(m)
         if (typeFilter === "entrada") return type === "entrada"
@@ -223,7 +223,7 @@ export default function FinanzasPage() {
       }
     })
 
-    return { totalIncome, totalExpenses, incomeCount, expenseCount }
+    return { totalIncome, totalExpenses, incomeCount, expenseCount, depositCount: incomeCount }
   }, [filteredMovements])
 
   const handleReset = () => {
@@ -233,6 +233,8 @@ export default function FinanzasPage() {
     setUserFilter("all_users")
     setSearchQuery("")
   }
+
+  const uniqueUsers = useMemo(() => Array.from(new Set(movements.map((movement) => movement.userName).filter(Boolean))).sort(), [movements])
 
   const hasActiveFilters =
     periodFilter !== "today" ||

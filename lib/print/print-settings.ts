@@ -11,6 +11,7 @@ export interface PrintSettings {
   printerName?: string
   printerWidth: number // 42 for 80mm, 56 for 58mm, 80 for A4
   useThermalFont: boolean // Use monospace for thermal printers
+  useThermalPrinter?: boolean // Legacy alias for thermal printer mode
   
   // Receipt customization
   showStoreInfo: boolean // Show store name, code, address
@@ -52,6 +53,7 @@ export interface PrintSettings {
 export const DEFAULT_PRINT_SETTINGS: Omit<PrintSettings, 'storeId'> = {
   printerWidth: 42, // 80mm standard
   useThermalFont: true,
+  useThermalPrinter: true,
   showStoreInfo: true,
   showOrderNumber: true,
   showDateTime: true,
@@ -83,6 +85,7 @@ export const PRINTER_PROFILES = {
     name: "Impresora Térmica 80mm",
     printerWidth: 42,
     useThermalFont: true,
+  useThermalPrinter: true,
     paperWidth: 80,
     autocut: true,
   },
@@ -90,6 +93,7 @@ export const PRINTER_PROFILES = {
     name: "Impresora Térmica 58mm",
     printerWidth: 32,
     useThermalFont: true,
+  useThermalPrinter: true,
     paperWidth: 58,
     autocut: true,
   },

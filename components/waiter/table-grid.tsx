@@ -29,7 +29,7 @@ export function TableGrid({ tables, onTableSelect, readyOrders = [] }: TableGrid
   // Map of table IDs to ready orders count
   const readyOrdersMap = readyOrders.reduce(
     (acc, order) => {
-      acc[order.tableId] = (acc[order.tableId] || 0) + 1
+      if (order.tableId) acc[order.tableId] = (acc[order.tableId] || 0) + 1
       return acc
     },
     {} as Record<string, number>

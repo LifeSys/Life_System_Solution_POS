@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document explains how store isolation is enforced in the MultiPizza POS system and how to validate that users cannot access unauthorized stores.
+This document explains how store isolation is enforced in the LifeSystemSolution POS system and how to validate that users cannot access unauthorized stores.
 
 ## Architecture
 
@@ -93,7 +93,7 @@ const data = await queryDocumentsByUserStores("orders", userId)
 ### Test 1: Normal User Single Store Access
 
 **Setup:**
-- User: `pascana@multipizza.com` (Pine store)
+- User: `pascana@lifesystemsolution.com` (Pine store)
 - PIN: `1234`
 - Role: `mesero`
 - storeId: `pine_store_id`
@@ -122,7 +122,7 @@ Access denied: Other stores NOT in list
 ### Test 2: Admin Global Multi-Store Access
 
 **Setup:**
-- User: `admin@multipizza.com` (Multi-store admin)
+- User: `admin@lifesystemsolution.com` (Multi-store admin)
 - PIN: `5678`
 - Role: `admin_global`
 - storeId: `undefined` (not used)
@@ -154,7 +154,7 @@ Switch store: Works ✓
 
 **Setup:**
 - Try to use one store's user PIN on a different store
-- User: `pascana@multipizza.com` (Pine store)
+- User: `pascana@lifesystemsolution.com` (Pine store)
 - PIN: `1234`
 - Try store code: "EMPANADERIA"
 
@@ -178,7 +178,7 @@ Audit log shows attempted cross-store access
 
 **Setup:**
 - Try to access a store user has no access to
-- User: `pascana@multipizza.com` (Pine store)
+- User: `pascana@lifesystemsolution.com` (Pine store)
 - Try store code: "NONEXISTENT" or "FAKE"
 
 **Expected Behavior:**

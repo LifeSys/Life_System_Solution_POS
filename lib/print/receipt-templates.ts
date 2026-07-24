@@ -6,7 +6,7 @@
 import { ReceiptElement } from "@/lib/print/thermal-printer"
 import { generateSummaryLine, wrapText } from "@/lib/print/thermal-printer"
 import type { Order, CashRegister, Store } from "@/lib/firebase/firestore"
-import { toPeruDate, formatReceiptDateTime } from "@/lib/utils"
+import { toPeruDate, formatReceiptDateTime, formatPeruTime } from "@/lib/utils"
 
 /**
  * Generate order/invoice receipt - Professional Customer Ticket
@@ -182,7 +182,7 @@ export function generateKitchenTicket(order: Order, store?: Store): ReceiptEleme
   // Order info
   elements.push(
     { type: "text", content: `Mesa: ${order.tableNumber}`, size: "double", bold: true },
-    { type: "text", content: `Hora: ${new Date(order.createdAt).toLocaleTimeString("es-PE")}` },
+    { type: "text", content: `Hora: ${formatPeruTime(order.createdAt)}` },
     { type: "line" }
   )
 
@@ -215,7 +215,7 @@ export function generateKitchenTicket(order: Order, store?: Store): ReceiptEleme
 
   // Priority indicator
   const now = new Date()
-  const orderTime = new Date(order.createdAt)
+  const orderTime = toPeruDate(order.createdAt)
   const minutesOld = Math.floor((now.getTime() - orderTime.getTime()) / 60000)
 
   if (minutesOld > 10) {
@@ -265,13 +265,13 @@ export function generateCashClosureReport(
 
   // Dates and operator
   elements.push(
-    { type: "text", content: `Abierta: ${toPeruDate(closure.openedAt)} ${new Date(closure.openedAt).toLocaleTimeString("es-PE")}` }
+    { type: "text", content: `Abierta: ${toPeruDate(closure.openedAt)} ${formatPeruTime(closure.openedAt)}` }
   )
 
   if (closure.closedAt) {
     elements.push({
       type: "text",
-      content: `Cerrada: ${toPeruDate(closure.closedAt)} ${new Date(closure.closedAt).toLocaleTimeString("es-PE")}`,
+      content: `Cerrada: ${toPeruDate(closure.closedAt)} ${formatPeruTime(closure.closedAt)}`,
     })
   }
 

@@ -9,6 +9,7 @@ import {
   subscribeToSafeBoxMovements,
   subscribeToOpenCashRegister,
   subscribeToPaidOrders,
+  type Expense,
   type ExpenseCategory,
   type SafeBoxMovement,
   type CashRegister,
@@ -31,7 +32,7 @@ interface BranchFinancials {
 
 export function GastosReports() {
   const { store, storeId } = useAuth()
-  const [expenses, setExpenses] = useState<any[]>([])
+  const [expenses, setExpenses] = useState<Expense[]>([])
   const [movements, setMovements] = useState<SafeBoxMovement[]>([])
   const [cashRegister, setCashRegister] = useState<CashRegister | null>(null)
   const [paidOrders, setPaidOrders] = useState<Order[]>([])
@@ -120,7 +121,7 @@ export function GastosReports() {
   }, [movements, paidOrders])
 
   // Calculate totals by category
-  const byCategory = expenses.reduce(
+  const byCategory = expenses.reduce<Record<ExpenseCategory, number>>(
     (acc, exp) => {
       const key = exp.category
       acc[key] = (acc[key] || 0) + exp.amount
@@ -143,7 +144,7 @@ export function GastosReports() {
     other: "Otros",
   }
 
-  const totalExpenses = Object.values(byCategory).reduce((sum, val) => sum + val, 0)
+  const totalExpenses = Object.values(byCategory).reduce((sum: number, val: number) => sum + val, 0)
 
   // Get operational balance from movements
   const operationalBalance = useMemo(() => {

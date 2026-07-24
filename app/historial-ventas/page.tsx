@@ -97,7 +97,7 @@ export default function SalesHistoryPage() {
       }
 
       // Table search filter
-      if (searchTable && !order.tableNumber.toString().includes(searchTable)) {
+      if (searchTable && !String(order.tableNumber ?? "").includes(searchTable)) {
         return false
       }
 
@@ -160,8 +160,8 @@ export default function SalesHistoryPage() {
     ]
     const rows = filteredOrders.map((order) => [
       order.tableNumber,
-      toPeruDate(order.createdAt.toDate()).split(" ")[0],
-      toPeruDate(order.createdAt.toDate()).split(" ")[1],
+      toPeruDate(order.createdAt).toLocaleDateString("es-PE"),
+      toPeruDate(order.createdAt).toLocaleTimeString("es-PE"),
       order.total.toFixed(2),
       order.paymentMethod || "Desconocido",
       order.items.length,
@@ -385,7 +385,7 @@ export default function SalesHistoryPage() {
                         Mesa {order.tableNumber}
                       </TableCell>
                       <TableCell className="text-sm">
-                        {toPeruDate(order.createdAt.toDate())}
+                        {toPeruDate(order.createdAt).toLocaleString("es-PE")}
                       </TableCell>
                       <TableCell className="text-sm">
                         {order.items.length}
@@ -396,25 +396,25 @@ export default function SalesHistoryPage() {
                       <TableCell>
                         <span
                           className={
-                            order.paymentMethod === "efectivo"
+                            order.paymentMethod === "cash"
                               ? "inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700"
-                              : order.paymentMethod === "tarjeta"
+                              : order.paymentMethod === "card"
                                 ? "inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-700"
                                 : "inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-purple-500/10 text-purple-700"
                           }
                         >
-                          {order.paymentMethod === "efectivo" && (
+                          {order.paymentMethod === "cash" && (
                             <Banknote className="h-3 w-3" />
                           )}
-                          {order.paymentMethod === "tarjeta" && (
+                          {order.paymentMethod === "card" && (
                             <CreditCard className="h-3 w-3" />
                           )}
                           {order.paymentMethod === "mixed" && (
                             <Smartphone className="h-3 w-3" />
                           )}
-                          {order.paymentMethod === "efectivo"
+                          {order.paymentMethod === "cash"
                             ? "Efectivo"
-                            : order.paymentMethod === "tarjeta"
+                            : order.paymentMethod === "card"
                               ? "Tarjeta"
                               : order.paymentMethod === "mixed"
                                 ? "Mixto"

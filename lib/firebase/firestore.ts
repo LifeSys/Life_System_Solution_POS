@@ -24,13 +24,15 @@ import {
 } from "firebase/firestore"
 import { db } from "./config"
 
+export type FirestoreDate = Timestamp
+
 // Types
 export interface Store {
   id?: string
   name: string
   code: string
   active: boolean
-  createdAt: Timestamp
+  createdAt: FirestoreDate
   firebaseUid?: string // Firebase UID of admin for this store
   firebaseEmail?: string // Firebase email of admin for this store
 }
@@ -116,7 +118,7 @@ export interface PizzaConfig {
   // Available flavors (metadata only - NOT inventory products)
   flavors: string[]
   active: boolean
-  updatedAt?: Timestamp
+  updatedAt?: FirestoreDate
 }
 
 // Updated OrderItem: Now a top-level document with full status tracking
@@ -140,15 +142,15 @@ export interface OrderItem {
   status: "pending" | "sent_to_kitchen" | "preparing" | "ready" | "delivered"
   cancelled: boolean
   cancelReason?: string
-  cancelAcknowledgedAt?: Timestamp
-  sentAt?: Timestamp // When this item was sent to kitchen
+  cancelAcknowledgedAt?: FirestoreDate
+  sentAt?: FirestoreDate // When this item was sent to kitchen
   sentCount?: number // How many times this item has been prepared
-  readyAt?: Timestamp
-  deliveredAt?: Timestamp
-  createdAt: Timestamp
+  readyAt?: FirestoreDate
+  deliveredAt?: FirestoreDate
+  createdAt: FirestoreDate
   createdBy: string
   createdByName: string
-  updatedAt?: Timestamp
+  updatedAt?: FirestoreDate
 }
 
 // Updated Order: Simplified, no embedded items
@@ -164,9 +166,9 @@ export interface Order {
   paymentStatus: "pending" | "paid"
   paymentMethod?: PaymentMethod | "mixed"
   payments?: Payment[]
-  createdAt: Timestamp
-  updatedAt?: Timestamp
-  paidAt?: Timestamp
+  createdAt: FirestoreDate
+  updatedAt?: FirestoreDate
+  paidAt?: FirestoreDate
   userId?: string
   userName?: string
   cashRegisterId?: string
@@ -174,6 +176,9 @@ export interface Order {
   notes?: string
   cancelled: boolean
   cancelReason?: string
+  deleted?: boolean
+  readyAt?: FirestoreDate
+  totalAmount?: number
 }
 
 // Audit log for order compliance
@@ -185,8 +190,8 @@ export interface OrderAuditLog {
   action: "order_created" | "item_added" | "item_removed" | "item_cancelled" | "item_sent_to_kitchen" | "item_ready" | "item_delivered" | "order_paid" | "order_cancelled" | "order_edited" | "item_quantity_changed"
   userId: string
   userName: string
-  changes?: Record<string, { before: any; after: any }>
-  timestamp: Timestamp
+  changes?: Record<string, { before: unknown; after: unknown } | string | number>
+  timestamp: FirestoreDate
   notes?: string
 }
 
@@ -202,8 +207,8 @@ export interface InventoryItem {
   variantName?: string // e.g., "500 ml", "Familiar" - display name
   normalizedVariantName?: string // e.g., "500ml", "familiar" - normalized for lookups (legacy)
   currentStock: number
-  lastUpdated: Timestamp
-  createdAt: Timestamp
+  lastUpdated: FirestoreDate
+  createdAt: FirestoreDate
 }
 
 // Inventory movement log: track all stock changes
@@ -219,7 +224,7 @@ export interface InventoryMovement {
   notes?: string
   userId: string
   userName: string
-  timestamp: Timestamp
+  timestamp: FirestoreDate
 }
 
 export type PaymentMethod = "cash" | "card" | "yape"
@@ -249,10 +254,10 @@ export interface CashRegister {
   expectedCash?: number
   difference?: number
   status: "open" | "closed"
-  openedAt: Timestamp
+  openedAt: FirestoreDate
   openedBy: string
   openedByName: string
-  closedAt?: Timestamp
+  closedAt?: FirestoreDate
   closedBy?: string
   closedByName?: string
   // Sales snapshot saved at closing time
@@ -261,6 +266,7 @@ export interface CashRegister {
   yapeSales?: number
   totalSales?: number
   ordersCount?: number
+  totalCash?: number
 }
 
 export interface DailyReport {
@@ -300,8 +306,8 @@ export interface Provider {
   products?: string[] // List of products/services provided
   balance: number // Amount owed to provider (negative = we owe, positive = they owe us)
   totalPaid: number // Cumulative amount paid
-  createdAt: Timestamp
-  updatedAt?: Timestamp
+  createdAt: FirestoreDate
+  updatedAt?: FirestoreDate
   active: boolean
 }
 
@@ -317,11 +323,11 @@ export interface Expense {
   providerId?: string // Related provider if applicable
   receipt?: string // Optional receipt/document reference
   notes?: string
-  createdAt: Timestamp
-  updatedAt?: Timestamp
+  createdAt: FirestoreDate
+  updatedAt?: FirestoreDate
   isVoid?: boolean // Soft delete flag
   voidReason?: string
-  voidedAt?: Timestamp
+  voidedAt?: FirestoreDate
   voidedBy?: string
 }
 
@@ -330,12 +336,12 @@ export interface CashBoxBalance {
   storeId: string
   boxType: CashBoxType
   balance: number // Current balance
-  lastUpdated: Timestamp
+  lastUpdated: FirestoreDate
   history?: Array<{
     amount: number
     operation: "add" | "subtract"
     reason: string
-    timestamp: Timestamp
+    timestamp: FirestoreDate
   }>
 }
 
@@ -348,7 +354,7 @@ export interface ExpenseReport {
   expensesByCategory: Record<ExpenseCategory, number>
   expensesByProvider: Record<string, number>
   expensesByBox: Record<CashBoxType, number>
-  generatedAt: Timestamp
+  generatedAt: FirestoreDate
   generatedBy: string
 }
 
@@ -360,8 +366,8 @@ export interface AuditLog {
   action: "create" | "update" | "delete" | "void" | "transfer" | "distribute"
   userId: string
   userName: string
-  changes: Record<string, { before: any; after: any }>
-  timestamp: Timestamp
+  changes: Record<string, { before: unknown; after: unknown } | string | number>
+  timestamp: FirestoreDate
   notes?: string
 }
 
@@ -379,7 +385,7 @@ export interface FinancialMovement {
   relatedDocId?: string // Link to parent (expense, provider payment, closure)
   userId: string
   userName: string
-  timestamp: Timestamp // Server-generated
+  timestamp: FirestoreDate // Server-generated
   archived?: boolean // For archival after 90 days
   archivedAt?: Timestamp
 }
@@ -395,7 +401,7 @@ export interface CashDistribution {
   principalToStrongbox?: number
   userId: string
   userName: string
-  createdAt: Timestamp
+  createdAt: FirestoreDate
   status: "completed" | "cancelled"
 }
 
@@ -438,7 +444,7 @@ export interface DailyFinancialSummary {
   averageTicket: number
   
   // Metadata
-  createdAt: Timestamp
+  createdAt: FirestoreDate
   createdBy: string
   createdByName: string
   cajaClosureId: string // Link to source closure
@@ -482,21 +488,21 @@ export interface SafeBox {
   id?: string
   storeId: string
   currentBalance: number
-  createdAt: Timestamp | Date
+  createdAt: FirestoreDate | Date
   updatedAt: Timestamp | Date
 }
 
 export interface SafeBoxMovement {
   id?: string
   storeId: string
-  type: "deposit" | "withdrawal" | "expense"
+  type: "deposit" | "withdrawal" | "expense" | "opening" | "cash_distribution"
   amount: number
   source: "cash_register" | "safe_box"
   description: string
   cashRegisterId?: string
   userId: string
   userName: string
-  createdAt: Timestamp | Date
+  createdAt: FirestoreDate | Date
 }
 
 // ========== PRODUCT CACHE ==========
@@ -539,7 +545,7 @@ export async function getDocuments<T>(
 ): Promise<T[]> {
   const q = query(collection(db, collectionName), ...constraints)
   const querySnapshot = await getDocs(q)
-  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as T))
+  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as unknown as T))
 }
 
 export async function addDocument<T extends DocumentData>(
@@ -1437,7 +1443,7 @@ async function createOrderAuditLogEntry(
   action: "item_added" | "item_removed" | "item_quantity_changed" | "item_cancelled" | "order_edited",
   userId: string,
   userName: string,
-  changes: Record<string, { before: any; after: any }>,
+  changes: Record<string, { before: unknown; after: unknown } | string | number>,
   notes?: string
 ): Promise<void> {
   const auditRef = doc(collection(db, collections.orderAuditLog))
@@ -2915,7 +2921,7 @@ export async function queryDocumentsByUserStores<T extends DocumentData>(
     )
     
     const snapshot = await getDocs(q)
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as T))
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as unknown as T))
   } catch (error) {
     console.error("Error querying documents by user stores:", error)
     throw error
@@ -3000,7 +3006,7 @@ export async function registerProvider(
   storeId: string,
   provider: Omit<Provider, "id" | "createdAt" | "updatedAt">
 ): Promise<string> {
-  return addDocument<Omit<Provider, "id">>(collections.providers, {
+  return addDocument<Omit<Provider, "id" | "createdAt" | "updatedAt">>(collections.providers, {
     ...provider,
     storeId,
     balance: 0,

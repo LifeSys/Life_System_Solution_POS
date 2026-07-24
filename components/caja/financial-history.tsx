@@ -32,7 +32,8 @@ export interface FinancialMovementDisplay {
   origin?: string // "caja_operativa" | "caja_fuerte"
   userId: string
   userName: string
-  timestamp: any // Firestore Timestamp
+  timestamp?: Date | { toDate: () => Date } | string // Firestore Timestamp
+  createdAt?: Date | { toDate: () => Date } | string
   source?: string // backward compat: "cash_register" | "safe_box"
 }
 
@@ -94,7 +95,7 @@ export function FinancialHistory({ movements }: FinancialHistoryProps) {
       if (dateFilter) {
         const timestamp = m.timestamp || m.createdAt
         const movDate = toPeruDate(
-          timestamp instanceof Date ? timestamp : timestamp.toDate?.() || new Date(timestamp)
+          timestamp instanceof Date ? timestamp : typeof timestamp === "string" ? new Date(timestamp) : timestamp?.toDate?.() || new Date()
         )
         const filterDate = new Date(dateFilter)
         movDate.setHours(0, 0, 0, 0)

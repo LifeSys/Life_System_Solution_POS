@@ -1,4 +1,4 @@
-# Professional Receipt Design - MultiPizza POS
+# Professional Receipt Design - LifeSystemSolution POS
 
 ## Overview
 
@@ -30,8 +30,8 @@ The customer receipt has been completely redesigned to be professional, modern, 
 
 ```
 ================================
-MULTIPIZZA
-@multipizzaperu
+LIFESYSTEMSOLUTION
+@lifesystemsolutionperu
 ===============
 
 Local: Huánuco Centro
@@ -88,7 +88,7 @@ Tiempo estimado:
 
 ¡Gracias por su compra!
 Síguenos:
-@multipizzaperu
+@lifesystemsolutionperu
 
 ================================
 ```
@@ -99,7 +99,7 @@ Síguenos:
 
 ### Header Section
 - Store name in bold, large text
-- Social media handle (@multipizzaperu)
+- Social media handle (@lifesystemsolutionperu)
 - Separator line for visual clarity
 - Store location and RUC
 
