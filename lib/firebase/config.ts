@@ -2,14 +2,15 @@ import { initializeApp, getApps } from "firebase/app"
 import { getFirestore } from "firebase/firestore"
 import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth"
 
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDZVwR59Tfg6UNrH13PHftuodIx2Zyyd28",
-  authDomain: "multipizza-core.firebaseapp.com",
-  projectId: "multipizza-core",
-  storageBucket: "multipizza-core.firebasestorage.app",
-  messagingSenderId: "475852672554",
-  appId: "1:475852672554:web:16ef2e753ed4c6a844bd53"
-}
+  apiKey: "AIzaSyChiIbNEwdaaCbGmk4suA9y88OELEWiAOc",
+  authDomain: "lifesystemsolution.firebaseapp.com",
+  projectId: "lifesystemsolution",
+  storageBucket: "lifesystemsolution.firebasestorage.app",
+  messagingSenderId: "584706598607",
+  appId: "1:584706598607:web:3d705120271495a807f9ba",
+};
 
 // Initialize Firebase only if it hasn't been initialized
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
