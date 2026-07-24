@@ -1,67 +1,60 @@
-// Tipos para la integracion con la API de facturacion electronica (LifeSystemSolution-API-SUNAT)
-
-export type TipoComprobante = "NOTA_VENTA" | "BOLETA" | "FACTURA"
+// lib/models/comprobante.ts
+export type TipoComprobante = "BOLETA" | "FACTURA" | "NOTA_VENTA"
 
 export interface ClienteComprobante {
-  tipoDoc: "1" | "6" | "0" // 1=DNI, 6=RUC, 0=Sin documento (varios)
+  tipoDoc: string
   numDoc: string
   razonSocial: string
   direccion?: string
+  email?: string
+  telefono?: string
 }
 
-// Item tal como lo espera la API SUNAT (ver documentacion/04-Facturas.md del repo API)
+// Coincide exactamente con items.* de StoreBoletaRequest / StoreInvoiceRequest.
+// Requeridos: descripcion, unidad, cantidad, precio_unitario. El resto es nullable.
 export interface ItemComprobanteApi {
-  codigo: string
   descripcion: string
   unidad: string
   cantidad: number
   precio_unitario: number
-  tip_afe_igv: string
+
+  codigo?: string
+  cod_producto_sunat?: string
+  porcentaje_igv?: number
+  tip_afe_igv?: string
+  igv?: number
+  isc?: number
+  porcentaje_isc?: number
+  tip_sis_isc?: string
+  icbper?: number
+  factor_icbper?: number
+  mto_valor_unitario?: number
+  mto_valor_venta?: number
+  mto_base_igv?: number
+  total_impuestos?: number
+  descuentos?: number
 }
 
 export interface EmitirComprobanteRequest {
   tipo: TipoComprobante
-  orderId: string
-  storeId: string
   cliente: ClienteComprobante
-  observacion?: string
+  items: ItemComprobanteApi[]
+
+  fechaEmision?: string
+  // Solo aplican a BOLETA / FACTURA (nullable en el FormRequest, NOTA_VENTA no los usa)
+  fechaVencimiento?: string
+  codLocal?: string
+  tipoOperacion?: string
+  tipoMoneda?: string
+  formaPago?: string
 }
 
-// Respuesta normalizada que devuelve nuestra ruta /api/facturacion
-export interface ComprobanteResultado {
-  tipo: TipoComprobante
-  ok: boolean
-  externalId?: number | string
-  serie?: string
-  correlativo?: number
-  numeroCompleto?: string
-  sunatStatus?: string
-  sunatCode?: string | null
-  sunatDescription?: string | null
-  pdfUrl?: string
-  xmlUrl?: string
-  mensaje?: string // presente cuando ok=false
-}
-
-// Documento que guardamos en Firestore (coleccion "comprobantes") como cache/listado local.
-// La fuente de verdad legal (numeracion, estado ante SUNAT) vive en la API externa.
-export interface ComprobanteRegistro {
-  id?: string
-  storeId: string
-  orderId: string
-  tipo: TipoComprobante
-  cliente: ClienteComprobante
-  subtotal: number
-  igv: number
-  total: number
-  externalId?: number | string
-  serie?: string
-  correlativo?: number
-  numeroCompleto?: string
-  sunatStatus?: string
-  pdfUrl?: string
-  xmlUrl?: string
-  userId?: string
-  userName?: string
-  createdAt?: any
+// Forma de cada elemento devuelto por GET /v1/series
+export interface SerieApi {
+  id: number | string
+  tipo_documento: string
+  serie: string
+  correlativo: number
+  sucursal?: string
+  is_active: boolean
 }
