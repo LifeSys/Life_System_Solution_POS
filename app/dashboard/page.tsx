@@ -10,6 +10,8 @@ import {
   type Order,
   type Store,
 } from "@/lib/firebase/firestore"
+import FacturacionService from "@/lib/services/facturacion-service"
+import type { ComprobanteRegistro } from "@/lib/models/comprobante"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
@@ -29,6 +31,10 @@ import {
   Banknote,
   Smartphone,
   Calendar,
+  Receipt,
+  FileText,
+  AlertTriangle,
+  CheckCircle2,
 } from "lucide-react"
 import { toPeruDate } from "@/lib/utils"
 import {
@@ -48,6 +54,7 @@ export default function DashboardPage() {
   const { currentStoreId, isSuperAdmin } = useAuth()
   const { theme } = useTheme()
   const [paidOrders, setPaidOrders] = useState<Order[]>([])
+  const [comprobantes, setComprobantes] = useState<ComprobanteRegistro[]>([])
   const [stores, setStores] = useState<Store[]>([])
   const [selectedStore, setSelectedStore] = useState<string>("current")
   const [dateRange, setDateRange] = useState<"today" | "week" | "month">("week")
@@ -81,7 +88,12 @@ export default function DashboardPage() {
       setIsLoading(false)
     })
 
-    return () => unsubscribe()
+    const unsubscribeComprobantes = FacturacionService.subscribir(storeId, setComprobantes)
+
+    return () => {
+      unsubscribe()
+      unsubscribeComprobantes()
+    }
   }, [currentStoreId, selectedStore])
 
   // Calculate date range boundaries using Peru timezone
@@ -145,6 +157,56 @@ export default function DashboardPage() {
   const averageTicket = reportData.ordersCount > 0 
     ? reportData.totalSales / reportData.ordersCount 
     : 0
+
+  // Comprobantes filtrados por el mismo rango de fechas que el resto del dashboard
+  const filteredComprobantes = useMemo(() => {
+    return comprobantes.filter((c) => {
+      const fecha = c.createdAt?.toDate?.()
+      if (!fecha) return false
+      const peruFecha = toPeruDate(fecha)
+      return peruFecha >= startDate && peruFecha <= endDate
+    })
+  }, [comprobantes, startDate, endDate])
+
+  // Desglose por tipo de comprobante (Nota de Venta / Boleta / Factura)
+  const comprobantesPorTipo = useMemo(() => {
+    const base = {
+      NOTA_VENTA: { cantidad: 0, total: 0 },
+      BOLETA: { cantidad: 0, total: 0 },
+      FACTURA: { cantidad: 0, total: 0 },
+    }
+    for (const c of filteredComprobantes) {
+      base[c.tipo].cantidad += 1
+      base[c.tipo].total += c.total || 0
+    }
+    return base
+  }, [filteredComprobantes])
+
+  // Desglose por estado SUNAT (solo aplica a Boleta/Factura, Nota de Venta es interna)
+  const estadoSunat = useMemo(() => {
+    const conteo = { aceptado: 0, pendiente: 0, rechazado: 0, anulado: 0 }
+    for (const c of filteredComprobantes) {
+      if (c.tipo === "NOTA_VENTA") continue
+      if (c.sunatStatus === "aceptado") conteo.aceptado += 1
+      else if (c.sunatStatus === "rechazado") conteo.rechazado += 1
+      else if (c.sunatStatus === "anulado") conteo.anulado += 1
+      else conteo.pendiente += 1 // enviado, pendiente, o sin estado aun
+    }
+    return conteo
+  }, [filteredComprobantes])
+
+  // Ventas cobradas en el rango que NO tienen un comprobante emitido en la API
+  // (ej. el pago pasó por Firebase pero la llamada a SUNAT falló)
+  const ventasSinComprobante = useMemo(() => {
+    const idsConComprobante = new Set(filteredComprobantes.map((c) => c.orderId))
+    return paidOrders.filter((order) => {
+      const orderDate = order.updatedAt?.toDate?.() || order.createdAt?.toDate?.()
+      if (!orderDate) return false
+      const peruOrderDate = toPeruDate(orderDate)
+      if (peruOrderDate < startDate || peruOrderDate > endDate) return false
+      return order.id && !idsConComprobante.has(order.id)
+    })
+  }, [paidOrders, filteredComprobantes, startDate, endDate])
 
   // Sales chart data (by day) - uses Peru timezone for display
   const salesChartData = useMemo(() => {
@@ -331,6 +393,100 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Comprobantes por tipo */}
+      <div>
+        <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+          <Receipt className="h-4 w-4" />
+          Comprobantes emitidos
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          <Card>
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Notas de Venta</p>
+                  <p className="text-lg sm:text-xl font-bold">S/ {comprobantesPorTipo.NOTA_VENTA.total.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">{comprobantesPorTipo.NOTA_VENTA.cantidad} emitidas</p>
+                </div>
+                <FileText className="h-8 w-8 text-muted-foreground/40" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Boletas</p>
+                  <p className="text-lg sm:text-xl font-bold">S/ {comprobantesPorTipo.BOLETA.total.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">{comprobantesPorTipo.BOLETA.cantidad} emitidas</p>
+                </div>
+                <Receipt className="h-8 w-8 text-blue-500/40" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Facturas</p>
+                  <p className="text-lg sm:text-xl font-bold">S/ {comprobantesPorTipo.FACTURA.total.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">{comprobantesPorTipo.FACTURA.cantidad} emitidas</p>
+                </div>
+                <Receipt className="h-8 w-8 text-primary/40" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Estado ante SUNAT (solo Boleta + Factura) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-3">
+          <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+            <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs text-muted-foreground">Aceptados</p>
+              <p className="font-semibold text-sm">{estadoSunat.aceptado}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs text-muted-foreground">Pendientes</p>
+              <p className="font-semibold text-sm">{estadoSunat.pendiente}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+            <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs text-muted-foreground">Rechazados</p>
+              <p className="font-semibold text-sm">{estadoSunat.rechazado}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-muted/30 border border-border">
+            <Receipt className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs text-muted-foreground">Anulados</p>
+              <p className="font-semibold text-sm">{estadoSunat.anulado}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Alerta: ventas cobradas sin comprobante emitido en la API */}
+        {ventasSinComprobante.length > 0 && (
+          <div className="flex items-center justify-between gap-3 mt-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
+              <p className="text-sm text-amber-700 dark:text-amber-400">
+                {ventasSinComprobante.length} venta{ventasSinComprobante.length > 1 ? "s" : ""} cobrada
+                {ventasSinComprobante.length > 1 ? "s" : ""} sin comprobante emitido en la API (revisa Comprobantes)
+              </p>
+            </div>
+            <Button variant="outline" size="sm" asChild>
+              <a href="/comprobantes">Revisar</a>
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Charts */}

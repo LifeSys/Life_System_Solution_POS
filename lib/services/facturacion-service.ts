@@ -1,6 +1,7 @@
 import type { Order, OrderItem } from "@/lib/firebase/firestore"
 import { addDocument, getDocuments, updateDocument, collections } from "@/lib/firebase/firestore"
-import { where, orderBy } from "firebase/firestore"
+import { db } from "@/lib/firebase/config"
+import { where, orderBy, query, collection, onSnapshot } from "firebase/firestore"
 import type {
   ClienteComprobante,
   ComprobanteRegistro,
@@ -108,6 +109,19 @@ export const FacturacionService = {
       where("storeId", "==", storeId),
       orderBy("createdAt", "desc")
     )
+  },
+
+  /** Suscripcion en tiempo real, para Dashboard/Reportes y la seccion Comprobantes */
+  subscribir(storeId: string, callback: (comprobantes: ComprobanteRegistro[]) => void): () => void {
+    const q = query(
+      collection(db, collections.comprobantes),
+      where("storeId", "==", storeId),
+      orderBy("createdAt", "desc")
+    )
+    return onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as ComprobanteRegistro))
+      callback(data)
+    })
   },
 
   /** Vuelve a consultar el estado ante SUNAT de un comprobante y actualiza la copia local */
