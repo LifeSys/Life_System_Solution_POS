@@ -14,6 +14,16 @@ import type {
 // Firestore sí lo trae embebido (asi lo usa el resto del POS, ej. app/caja/page.tsx).
 type OrderConItems = Order & { id: string; items?: OrderItem[] }
 
+// Firestore rechaza cualquier campo con valor `undefined` (addDoc/updateDoc lanzan
+// FirebaseError: "Unsupported field value: undefined"). Los campos que vienen de la
+// respuesta de la API (sunatStatus, sunatCode, sunatDescription, pdfUrl, xmlUrl, etc.)
+// pueden no venir en la respuesta, así que se limpian antes de escribir en Firestore.
+function limpiarUndefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, value]) => value !== undefined)
+  ) as Partial<T>
+}
+
 function construirItems(order: OrderConItems): ItemComprobanteApi[] {
   return (order.items || [])
     .filter((i) => !i.cancelled)
@@ -77,7 +87,7 @@ export const FacturacionService = {
       const igv = Number((order.total - order.total / 1.18).toFixed(2))
       const subtotal = Number((order.total - igv).toFixed(2))
 
-      await addDocument<Omit<ComprobanteRegistro, "id">>(collections.comprobantes, {
+      const documento = limpiarUndefined({
         storeId: order.storeId,
         orderId: order.id,
         tipo,
@@ -90,11 +100,18 @@ export const FacturacionService = {
         correlativo: resultado.correlativo,
         numeroCompleto: resultado.numeroCompleto,
         sunatStatus: resultado.sunatStatus,
+        sunatCode: resultado.sunatCode,
+        sunatDescription: resultado.sunatDescription,
         pdfUrl: resultado.pdfUrl,
         xmlUrl: resultado.xmlUrl,
         userId,
         userName,
       })
+
+      await addDocument<Omit<ComprobanteRegistro, "id">>(
+        collections.comprobantes,
+        documento as Omit<ComprobanteRegistro, "id">
+      )
     } catch (e) {
       console.error("No se pudo guardar el comprobante localmente (ya fue emitido en la API):", e)
     }
@@ -138,16 +155,22 @@ export const FacturacionService = {
     const actualizado: ComprobanteRegistro = {
       ...comprobante,
       sunatStatus: json.sunatStatus,
+      sunatCode: json.sunatCode,
+      sunatDescription: json.sunatDescription,
       pdfUrl: json.pdfUrl || comprobante.pdfUrl,
       xmlUrl: json.xmlUrl || comprobante.xmlUrl,
     }
 
     try {
-      await updateDocument(collections.comprobantes, comprobante.id, {
+      const cambios = limpiarUndefined({
         sunatStatus: actualizado.sunatStatus,
+        sunatCode: actualizado.sunatCode,
+        sunatDescription: actualizado.sunatDescription,
         pdfUrl: actualizado.pdfUrl,
         xmlUrl: actualizado.xmlUrl,
       })
+
+      await updateDocument(collections.comprobantes, comprobante.id, cambios)
     } catch (e) {
       console.error("No se pudo guardar el estado actualizado localmente:", e)
     }

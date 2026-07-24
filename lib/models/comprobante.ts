@@ -49,12 +49,72 @@ export interface EmitirComprobanteRequest {
   formaPago?: string
 }
 
-// Forma de cada elemento devuelto por GET /v1/series
+// Forma real de cada elemento devuelto por GET /v1/series
 export interface SerieApi {
-  id: number | string
+  id: number
+  tipo: string // "factura" | "boleta" | "nota_venta"
   tipo_documento: string
   serie: string
   correlativo: number
-  sucursal?: string
-  is_active: boolean
+  siguiente_numero: string
+  sucursal: {
+    id: number
+    nombre: string
+    cod_local: string
+  }
+  activo: boolean
+}
+
+// Respuesta devuelta por /api/facturacion
+export interface ComprobanteResultado {
+  ok: boolean
+  tipo: TipoComprobante
+  mensaje?: string
+
+  externalId?: string | number
+  serie?: string
+  correlativo?: number
+  numeroCompleto?: string
+
+  sunatStatus?: string
+  sunatCode?: string | number | null
+  sunatDescription?: string | null
+
+  pdfUrl?: string | null
+  xmlUrl?: string | null
+}
+
+// Documento almacenado en Firestore
+export interface ComprobanteRegistro {
+  id?: string
+
+  storeId: string
+  orderId: string
+
+  tipo: TipoComprobante
+
+  cliente: ClienteComprobante
+
+  subtotal: number
+  igv: number
+  total: number
+
+  externalId?: string | number
+
+  serie?: string
+  correlativo?: number
+  numeroCompleto?: string
+
+  sunatStatus?: string
+  sunatCode?: string | number | null
+  sunatDescription?: string | null
+
+  pdfUrl?: string | null
+  xmlUrl?: string | null
+
+  userId?: string
+  userName?: string
+
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }

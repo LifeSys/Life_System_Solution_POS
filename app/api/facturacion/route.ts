@@ -13,6 +13,12 @@ const ENDPOINT_POR_TIPO: Record<TipoComprobante, string> = {
   NOTA_VENTA: "notas-venta",
 }
 
+// Mapea el tipo interno del POS al valor real que devuelve Laravel en el campo "tipo" (minúsculas).
+const TIPO_SERIE_ESPERADO: Record<"BOLETA" | "FACTURA", string> = {
+  BOLETA: "boleta",
+  FACTURA: "factura",
+}
+
 function authHeaders() {
   return {
     "Content-Type": "application/json",
@@ -28,23 +34,31 @@ async function obtenerSerieActiva(tipo: "BOLETA" | "FACTURA"): Promise<string> {
   const res = await fetch(`${BASE_URL!.replace(/\/+$/, "")}/series?tipo=${tipo}`, {
     headers: { "X-Api-Key": API_KEY as string, "X-Api-Secret": API_SECRET as string },
   })
-  const json = await res.json().catch(() => null)
+  const text = await res.text()
+
+  let json = null
+  try {
+    json = JSON.parse(text)
+  } catch { }
 
   if (!res.ok || json?.estado === "error") {
     throw new Error(json?.mensaje || `No se pudo consultar las series para ${tipo}`)
   }
 
   const series: SerieApi[] = json?.datos || []
-  if (!series.length) {
-    throw new Error(`No hay series configuradas para ${tipo}. Debes crear una serie en /api/v1/series`)
+  const tipoEsperado = TIPO_SERIE_ESPERADO[tipo]
+
+  const serieValida = series.find(
+    (s) => s.tipo === tipoEsperado && s.activo === true
+  )
+
+  if (!serieValida?.serie) {
+    throw new Error(
+      `No se encontró una serie activa de tipo "${tipoEsperado}" para ${tipo}. Verifica /api/v1/series`
+    )
   }
 
-  const activa = series.find((s) => s.is_active) ?? series[0]
-  if (!activa?.serie) {
-    throw new Error(`No se encontró una serie válida para ${tipo}`)
-  }
-
-  return activa.serie
+  return serieValida.serie
 }
 
 export async function POST(req: NextRequest) {
@@ -120,6 +134,10 @@ export async function POST(req: NextRequest) {
         // correlativo y totales (mto_oper_gravadas, mto_igv, etc.) son nullable y
         // Laravel los calcula/asigna automáticamente: el POS NO los envía.
       }
+
+      // TEMPORAL: verificar que la serie corresponde al tipo antes de enviar.
+      console.log("Serie seleccionada:", serie)
+      console.log("Payload:", payload)
     }
 
     const res = await fetch(`${BASE_URL.replace(/\/+$/, "")}/${endpoint}`, {
@@ -128,7 +146,12 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify(payload),
     })
 
-    const json = await res.json().catch(() => null)
+    const text = await res.text()
+
+    let json = null
+    try {
+      json = JSON.parse(text)
+    } catch { }
 
     if (!res.ok || !json || json.estado === "error") {
       const mensaje = json?.mensaje || `Error ${res.status} al emitir ${body.tipo}`
@@ -177,7 +200,12 @@ export async function GET(req: NextRequest) {
     const res = await fetch(`${BASE_URL.replace(/\/+$/, "")}/${endpoint}/${id}`, {
       headers: { "X-Api-Key": API_KEY, "X-Api-Secret": API_SECRET },
     })
-    const json = await res.json().catch(() => null)
+    const text = await res.text()
+
+    let json = null
+    try {
+      json = JSON.parse(text)
+    } catch { }
 
     if (!res.ok || !json?.datos) {
       return NextResponse.json({ ok: false, mensaje: "No se pudo consultar el estado" }, { status: res.status || 502 })
