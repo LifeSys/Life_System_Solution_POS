@@ -1,5 +1,5 @@
 import type { Order, OrderItem } from "@/lib/firebase/firestore"
-import { addDocument, getDocuments, collections } from "@/lib/firebase/firestore"
+import { addDocument, getDocuments, updateDocument, collections } from "@/lib/firebase/firestore"
 import { where, orderBy } from "firebase/firestore"
 import type {
   ClienteComprobante,
@@ -101,13 +101,44 @@ export const FacturacionService = {
     return resultado
   },
 
-  /** Lista los comprobantes emitidos para la futura seccion "Comprobantes" */
+  /** Lista los comprobantes emitidos para la seccion "Comprobantes" */
   async listar(storeId: string): Promise<ComprobanteRegistro[]> {
     return getDocuments<ComprobanteRegistro>(
       collections.comprobantes,
       where("storeId", "==", storeId),
       orderBy("createdAt", "desc")
     )
+  },
+
+  /** Vuelve a consultar el estado ante SUNAT de un comprobante y actualiza la copia local */
+  async refrescarEstado(comprobante: ComprobanteRegistro): Promise<ComprobanteRegistro> {
+    if (!comprobante.id || !comprobante.externalId || comprobante.tipo === "NOTA_VENTA") {
+      return comprobante
+    }
+
+    const res = await fetch(`/api/facturacion?tipo=${comprobante.tipo}&id=${comprobante.externalId}`)
+    const json = await res.json()
+
+    if (!json.ok) return comprobante
+
+    const actualizado: ComprobanteRegistro = {
+      ...comprobante,
+      sunatStatus: json.sunatStatus,
+      pdfUrl: json.pdfUrl || comprobante.pdfUrl,
+      xmlUrl: json.xmlUrl || comprobante.xmlUrl,
+    }
+
+    try {
+      await updateDocument(collections.comprobantes, comprobante.id, {
+        sunatStatus: actualizado.sunatStatus,
+        pdfUrl: actualizado.pdfUrl,
+        xmlUrl: actualizado.xmlUrl,
+      })
+    } catch (e) {
+      console.error("No se pudo guardar el estado actualizado localmente:", e)
+    }
+
+    return actualizado
   },
 }
 

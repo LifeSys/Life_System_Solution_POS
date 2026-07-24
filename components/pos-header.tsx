@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { User, LogOut, LayoutGrid, ChefHat, CreditCard, Settings, BarChart3, Building2, RefreshCw, Moon, Sun, Package } from "lucide-react"
+import { User, LogOut, LayoutGrid, ChefHat, CreditCard, Settings, BarChart3, Building2, RefreshCw, Moon, Sun, Package, Receipt } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useState } from "react"
@@ -99,12 +99,20 @@ export function POSHeader({ title }: POSHeaderProps) {
             </Link>
           )}
           {isCajero && (
-            <Link href="/caja">
-              <Button variant="ghost" size="sm" className="gap-2">
-                <CreditCard className="h-4 w-4" />
-                Caja
-              </Button>
-            </Link>
+            <>
+              <Link href="/caja">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <CreditCard className="h-4 w-4" />
+                  Caja
+                </Button>
+              </Link>
+              <Link href="/comprobantes">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <Receipt className="h-4 w-4" />
+                  Comprobantes
+                </Button>
+              </Link>
+            </>
           )}
           {isAdmin && (
             <>
@@ -112,6 +120,12 @@ export function POSHeader({ title }: POSHeaderProps) {
                 <Button variant="ghost" size="sm" className="gap-2">
                   <Settings className="h-4 w-4" />
                   Admin
+                </Button>
+              </Link>
+              <Link href="/comprobantes">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <Receipt className="h-4 w-4" />
+                  Comprobantes
                 </Button>
               </Link>
               <Link href="/inventario">
@@ -181,12 +195,20 @@ export function POSHeader({ title }: POSHeaderProps) {
                   </DropdownMenuItem>
                 )}
                 {isCajero && (
-                  <DropdownMenuItem asChild>
-                    <Link href="/caja" className="gap-2">
-                      <CreditCard className="h-4 w-4" />
-                      Caja
-                    </Link>
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link href="/caja" className="gap-2">
+                        <CreditCard className="h-4 w-4" />
+                        Caja
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/comprobantes" className="gap-2">
+                        <Receipt className="h-4 w-4" />
+                        Comprobantes
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
                 )}
                 {isAdmin && (
                   <>
@@ -194,6 +216,12 @@ export function POSHeader({ title }: POSHeaderProps) {
                       <Link href="/admin" className="gap-2">
                         <Settings className="h-4 w-4" />
                         Admin
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/comprobantes" className="gap-2">
+                        <Receipt className="h-4 w-4" />
+                        Comprobantes
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
