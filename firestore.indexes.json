@@ -1,0 +1,19 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "safe_box_movements",
+      "queryScope": "Collection",
+      "fields": [
+        {
+          "fieldPath": "storeId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
