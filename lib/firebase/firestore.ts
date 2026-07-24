@@ -452,6 +452,7 @@ export const collections = {
   orders: "orders",
   orderItems: "order_items", // NEW: Separated from orders
   orderAuditLog: "order_audit_log", // NEW: Order compliance audit trail
+  comprobantes: "comprobantes", // Cache local de comprobantes emitidos via API SUNAT
   tables: "tables",
   cashRegister: "cash_register",
   dailyReports: "daily_reports",

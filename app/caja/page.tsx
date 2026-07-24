@@ -55,6 +55,8 @@ import { CashMovementModal } from "@/components/caja/cash-movement-modal"
 import { generateOrderReceipt } from "@/lib/print/receipt-templates"
 import { generatePrintHTML } from "@/lib/print/thermal-printer"
 import { usePrintSettings } from "@/lib/hooks/use-print-settings"
+import FacturacionService, { ClienteVarios } from "@/lib/services/facturacion-service"
+import type { TipoComprobante, ClienteComprobante } from "@/lib/models/comprobante"
 
 export default function CajaPage() {
   const { 
@@ -78,6 +80,10 @@ export default function CajaPage() {
     yape: "",
   })
   const [isProcessing, setIsProcessing] = useState(false)
+  const [tipoComprobante, setTipoComprobante] = useState<TipoComprobante>("NOTA_VENTA")
+  const [clienteDoc, setClienteDoc] = useState("")
+  const [clienteNombre, setClienteNombre] = useState("")
+  const [comprobanteWarning, setComprobanteWarning] = useState<string | null>(null)
   const [showReceipt, setShowReceipt] = useState(false)
   const [lastProcessedOrder, setLastProcessedOrder] = useState<Order | null>(null)
   
@@ -200,11 +206,63 @@ export default function CajaPage() {
       return
     }
 
+    // Validate cliente data required for Factura
+    if (tipoComprobante === "FACTURA") {
+      if (!/^\d{11}$/.test(clienteDoc.trim())) {
+        alert("Para emitir Factura necesitas el RUC del cliente (11 dígitos)")
+        return
+      }
+      if (!clienteNombre.trim()) {
+        alert("Para emitir Factura necesitas la Razón Social del cliente")
+        return
+      }
+    }
+    if (tipoComprobante === "BOLETA" && clienteDoc.trim() && !/^\d{8}$/.test(clienteDoc.trim())) {
+      alert("El DNI del cliente debe tener 8 dígitos (o déjalo vacío para Cliente Varios)")
+      return
+    }
+
     setIsProcessing(true)
+    setComprobanteWarning(null)
 
     try {
       await processPayment(selectedOrder.id, payments)
-      
+
+      // Emitir el comprobante correspondiente via API (ya no se guarda simulado en Firebase)
+      const cliente: ClienteComprobante =
+        tipoComprobante === "NOTA_VENTA" || !clienteDoc.trim()
+          ? ClienteVarios
+          : {
+              tipoDoc: tipoComprobante === "FACTURA" ? "6" : "1",
+              numDoc: clienteDoc.trim(),
+              razonSocial: clienteNombre.trim() || "CLIENTE VARIOS",
+            }
+
+      const resultado = await FacturacionService.emitir({
+        tipo: tipoComprobante,
+        order: selectedOrder as any,
+        cliente,
+        userId: user?.id,
+        userName: user?.name,
+      })
+
+      if (!resultado.ok) {
+        // El pago ya se registró en caja; solo avisamos que la emisión ante la API falló.
+        setComprobanteWarning(
+          `El pago se procesó, pero no se pudo emitir el comprobante en la API: ${resultado.mensaje || "error desconocido"}`
+        )
+        toast({
+          title: "Pago registrado, comprobante pendiente",
+          description: resultado.mensaje || "No se pudo emitir el comprobante en la API",
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "Comprobante emitido",
+          description: resultado.numeroCompleto ? `Se emitió ${resultado.numeroCompleto}` : "Comprobante enviado a la API",
+        })
+      }
+
       setLastProcessedOrder({
         ...selectedOrder,
         payments,
@@ -213,6 +271,9 @@ export default function CajaPage() {
       setShowReceipt(true)
       setSelectedOrder(null)
       setPaymentAmounts({ cash: "", card: "", yape: "" })
+      setTipoComprobante("NOTA_VENTA")
+      setClienteDoc("")
+      setClienteNombre("")
     } catch (error: any) {
       alert(error?.message || "Error al procesar el pago")
     } finally {
@@ -803,6 +864,59 @@ export default function CajaPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Tipo de Comprobante */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium">Tipo de Comprobante</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(["NOTA_VENTA", "BOLETA", "FACTURA"] as TipoComprobante[]).map((tipo) => (
+                      <Button
+                        key={tipo}
+                        type="button"
+                        variant={tipoComprobante === tipo ? "default" : "outline"}
+                        className="h-auto py-3 text-xs sm:text-sm"
+                        onClick={() => setTipoComprobante(tipo)}
+                      >
+                        {tipo === "NOTA_VENTA" ? "Nota de Venta" : tipo === "BOLETA" ? "Boleta" : "Factura"}
+                      </Button>
+                    ))}
+                  </div>
+
+                  {tipoComprobante !== "NOTA_VENTA" && (
+                    <div className="grid grid-cols-2 gap-3 pt-1">
+                      <div className="space-y-1">
+                        <label className="text-xs text-muted-foreground">
+                          {tipoComprobante === "FACTURA" ? "RUC (11 dígitos)" : "DNI (opcional)"}
+                        </label>
+                        <Input
+                          value={clienteDoc}
+                          onChange={(e) => setClienteDoc(e.target.value.replace(/\D/g, ""))}
+                          placeholder={tipoComprobante === "FACTURA" ? "20123456789" : "12345678"}
+                          maxLength={tipoComprobante === "FACTURA" ? 11 : 8}
+                          className="bg-input"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs text-muted-foreground">
+                          {tipoComprobante === "FACTURA" ? "Razón Social" : "Nombre (opcional)"}
+                        </label>
+                        <Input
+                          value={clienteNombre}
+                          onChange={(e) => setClienteNombre(e.target.value)}
+                          placeholder={tipoComprobante === "FACTURA" ? "Empresa S.A.C." : "Cliente"}
+                          className="bg-input"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {comprobanteWarning && (
+                  <div className="flex items-center gap-2 p-2 rounded bg-amber-500/10 border border-amber-500/20 text-sm text-amber-600">
+                    <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                    <span>{comprobanteWarning}</span>
+                  </div>
+                )}
 
                 {/* Confirm Payment Button */}
                 <Button
