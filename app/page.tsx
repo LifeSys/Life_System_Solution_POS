@@ -60,9 +60,10 @@ export default function LoginPage() {
   // After user logs in with PIN, filter stores based on user's access
   useEffect(() => {
     if (user && loginMode === "normal") {
+      const currentUser = user
       async function loadUserStores() {
         try {
-          const userStores = await getStoresByUser(user)
+          const userStores = await getStoresByUser(currentUser)
           setStores(userStores)
         } catch (err) {
           console.error("Error loading user stores:", err)
