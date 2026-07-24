@@ -1283,7 +1283,7 @@ export default function AdminPage() {
                 onChange={(e) =>
                   setStoreForm({ ...storeForm, name: e.target.value })
                 }
-                placeholder="Ej: Multipizza San Felipe"
+                placeholder="Ej: LifeSystemSolution Jesus Maria"
               />
             </div>
             <div className="space-y-2">

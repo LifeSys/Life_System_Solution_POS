@@ -1356,7 +1356,7 @@ export default function CajaPage() {
           {lastProcessedOrder && (
             <div className="py-4">
               <div className="text-center mb-4">
-                <p className="text-lg font-bold">MultiPizza</p>
+                <p className="text-lg font-bold">LifeSystemSolution</p>
                 <p className="text-sm text-muted-foreground">
                   {toPeruDate(new Date()).toLocaleString("es-PE")}
                 </p>

@@ -10,9 +10,9 @@ import './globals.css'
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
 export const metadata: Metadata = {
-  title: 'Multipizza POS',
-  description: 'Sistema POS profesional para MultiPizza',
-  generator: 'Multipizza POS',
+  title: 'LifeSystemSolution POS',
+  description: 'Sistema POS profesional para LifeSystemSolution',
+  generator: 'LifeSystemSolution POS',
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },

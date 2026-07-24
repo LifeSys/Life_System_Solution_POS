@@ -1,7 +1,7 @@
 import { type User } from "@/lib/firebase/firestore"
 
 /**
- * Role-based permission system for MultiPizza POS
+ * Role-based permission system for LifeSystemSolution POS
  * 
  * Roles:
  * - super_admin: Full access to all stores and admin functions

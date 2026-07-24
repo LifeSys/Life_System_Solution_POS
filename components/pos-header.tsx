@@ -53,8 +53,8 @@ export function POSHeader({ title }: POSHeaderProps) {
         <div className="flex items-center gap-4">
           <Link href="/" className="flex-shrink-0 h-10 sm:h-12 w-24 sm:w-32 overflow-hidden flex items-center">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LOGO-mA4EhGhBGEPhESRU3bt9HPH96owwcV.png"
-              alt="MultiPizza"
+              src="lifesystemsolution-logo.png"
+              alt="LifeSystemSolution"
               width={128}
               height={48}
               className="h-full w-auto object-contain max-h-10 sm:max-h-12"

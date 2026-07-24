@@ -159,8 +159,8 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <div className="flex justify-center mb-8">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LOGO-mA4EhGhBGEPhESRU3bt9HPH96owwcV.png"
-              alt="MultiPizza Logo"
+              src="lifesystemsolution-logo.png"
+              alt="LifeSystemSolution Logo"
               width={280}
               height={140}
               className="object-contain"
@@ -188,7 +188,7 @@ export default function LoginPage() {
                 </label>
                 <Input
                   type="email"
-                  placeholder="admin@multipizza.com"
+                  placeholder="admin@lifesystemsolution.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="bg-input border-border"
@@ -242,7 +242,7 @@ export default function LoginPage() {
           </Card>
 
           <p className="text-center text-xs text-muted-foreground mt-6">
-            MultiPizza POS v1.0 - Sistema de Punto de Venta
+            LifeSystemSolution POS v1.0 - Sistema de Punto de Venta
           </p>
         </div>
       </main>
@@ -256,8 +256,8 @@ export default function LoginPage() {
         <div className="w-full max-w-lg">
           <div className="flex justify-center mb-8">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LOGO-mA4EhGhBGEPhESRU3bt9HPH96owwcV.png"
-              alt="MultiPizza Logo"
+              src="lifesystemsolution-logo.png"
+              alt="LifeSystemSolution Logo"
               width={280}
               height={140}
               className="object-contain"
@@ -314,7 +314,7 @@ export default function LoginPage() {
           </Card>
 
           <p className="text-center text-xs text-muted-foreground mt-6">
-            MultiPizza POS v1.0 - Sistema de Punto de Venta
+            LifeSystemSolution POS v1.0 - Sistema de Punto de Venta
           </p>
         </div>
       </main>
@@ -327,8 +327,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LOGO-mA4EhGhBGEPhESRU3bt9HPH96owwcV.png"
-            alt="MultiPizza Logo"
+            src="lifesystemsolution-logo.png"
+            alt="LifeSystemSolution Logo"
             width={280}
             height={140}
             className="object-contain"
@@ -465,7 +465,7 @@ export default function LoginPage() {
         </Card>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          MultiPizza POS v1.0 - Sistema de Punto de Venta
+          LifeSystemSolution POS v1.0 - Sistema de Punto de Venta
         </p>
       </div>
     </main>

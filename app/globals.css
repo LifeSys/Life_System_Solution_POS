@@ -5,7 +5,7 @@
 @custom-variant light (&:is(.light *));
 
 :root {
-  /* MultiPizza Dark Theme - Restaurant Style (Default) */
+  /* LifeSystemSolution Dark Theme - Restaurant Style (Default) */
   --background: oklch(0.1 0 0);
   --foreground: oklch(0.95 0 0);
   --card: oklch(0.15 0 0);
@@ -40,11 +40,11 @@
   --sidebar-border: oklch(0.25 0 0);
   --sidebar-ring: oklch(0.6 0.25 25);
   
-  /* Custom colors for MultiPizza */
-  --multipizza-red: #ff2b2b;
-  --multipizza-yellow: #ffcc00;
-  --multipizza-green: #22c55e;
-  --multipizza-orange: #f97316;
+  /* Custom colors for LifeSystemSolution */
+  --LifeSystemSolution-red: #ff2b2b;
+  --LifeSystemSolution-yellow: #ffcc00;
+  --LifeSystemSolution-green: #22c55e;
+  --LifeSystemSolution-orange: #f97316;
 }
 
 html.light {

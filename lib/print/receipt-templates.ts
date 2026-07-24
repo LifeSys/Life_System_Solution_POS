@@ -22,8 +22,8 @@ export function generateOrderReceipt(
   // ========== STORE HEADER ==========
   elements.push(
     { type: "text", content: "================================", align: "center" },
-    { type: "text", content: store?.name || "MULTIPIZZA", align: "center", size: "large", bold: true },
-    { type: "text", content: "@multipizzaperu", align: "center", bold: true },
+    { type: "text", content: store?.name || "LifeSystemSolution", align: "center", size: "large", bold: true },
+    { type: "text", content: "@LifeSystemSolution", align: "center", bold: true },
     { type: "text", content: "===============", align: "center" }
   )
 
@@ -159,7 +159,7 @@ export function generateOrderReceipt(
     { type: "spacer" },
     { type: "text", content: "¡Gracias por su compra!", align: "center", bold: true },
     { type: "text", content: "Síguenos:", align: "center" },
-    { type: "text", content: "@multipizzaperu", align: "center" },
+    { type: "text", content: "@LifeSystemSolution", align: "center" },
     { type: "spacer" },
     { type: "text", content: "================================", align: "center" }
   )
@@ -252,7 +252,7 @@ export function generateCashClosureReport(
 
   // Header
   elements.push(
-    { type: "text", content: store?.name || "MultiPizza POS", align: "center", size: "large", bold: true },
+    { type: "text", content: store?.name || "LifeSystemSolution POS", align: "center", size: "large", bold: true },
     { type: "text", content: `Local ${store?.code || "N/A"}`, align: "center" },
     { type: "line" }
   )
@@ -373,7 +373,7 @@ export function generateDailySalesReport(
 
   // Header
   elements.push(
-    { type: "text", content: store?.name || "MultiPizza POS", align: "center", size: "large", bold: true },
+    { type: "text", content: store?.name || "LifeSystemSolution POS", align: "center", size: "large", bold: true },
     { type: "text", content: `Local ${store?.code || "N/A"}`, align: "center" },
     { type: "line" }
   )
