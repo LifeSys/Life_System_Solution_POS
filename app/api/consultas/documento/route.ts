@@ -54,8 +54,17 @@ function normalizarDatos(tipo: "dni" | "ruc", numero: string, json: any) {
     : null
 }
 
-async function consultar(endpoint: string, signal: AbortSignal) {
-  const res = await fetch(endpoint, { headers: authHeaders(), signal })
+async function consultarDocumento(tipo: "dni" | "ruc", numero: string, signal: AbortSignal) {
+  const base = BASE_URL!.replace(/\/+$/, "")
+  const endpoint = `${base}/consulta/${tipo}`
+  const body = tipo === "dni" ? { dni: numero } : { ruc: numero }
+
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(body),
+    signal,
+  })
   const text = await res.text()
   let json: any = null
   try {
@@ -82,30 +91,28 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ ok: false, mensaje: "Longitud de documento inválida" }, { status: 400 })
     }
 
-    const base = BASE_URL.replace(/\/+$/, "")
-    const endpoints = [
-      `${base}/consultas/${tipo}/${numero}`,
-      `${base}/consultas/${tipo}?numero=${numero}`,
-      `${base}/consulta/${tipo}/${numero}`,
-    ]
+    const { res, json } = await consultarDocumento(tipo, numero, req.signal)
 
-    let lastStatus = 502
-    for (const endpoint of endpoints) {
-      const { res, json } = await consultar(endpoint, req.signal)
-      lastStatus = res.status
-      if (!res.ok || !json || json?.estado === "error" || json?.success === false) continue
-
-      const datos = normalizarDatos(tipo, numero, json)
-      if (!datos) continue
-
-      return NextResponse.json({
-        ok: true,
-        fuente: normalizarFuente(json) || "proveedor",
-        datos,
-      })
+    if (!res.ok || !json || json?.estado === "error" || json?.success === false) {
+      return NextResponse.json(
+        { ok: false, mensaje: json?.mensaje || "No se encontraron datos para el documento" },
+        { status: res.status || 502 }
+      )
     }
 
-    return NextResponse.json({ ok: false, mensaje: "No se encontraron datos para el documento" }, { status: lastStatus === 404 ? 404 : 502 })
+    const datos = normalizarDatos(tipo, numero, json)
+    if (!datos) {
+      return NextResponse.json(
+        { ok: false, mensaje: "No se encontraron datos para el documento" },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({
+      ok: true,
+      fuente: normalizarFuente(json) || "proveedor",
+      datos,
+    })
   } catch (error: any) {
     if (error?.name === "AbortError") {
       return NextResponse.json({ ok: false, mensaje: "Consulta cancelada" }, { status: 499 })
