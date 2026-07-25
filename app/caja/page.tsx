@@ -56,6 +56,8 @@ import { generateOrderReceipt } from "@/lib/print/receipt-templates"
 import { generatePrintHTML } from "@/lib/print/thermal-printer"
 import { usePrintSettings } from "@/lib/hooks/use-print-settings"
 import FacturacionService, { ClienteVarios } from "@/lib/services/facturacion-service"
+import { useDocumentLookup } from "@/lib/hooks/use-document-lookup"
+import type { ClienteLocal } from "@/lib/services/clientes-service"
 import type { TipoComprobante, ClienteComprobante } from "@/lib/models/comprobante"
 
 export default function CajaPage() {
@@ -83,10 +85,36 @@ export default function CajaPage() {
   const [tipoComprobante, setTipoComprobante] = useState<TipoComprobante>("NOTA_VENTA")
   const [clienteDoc, setClienteDoc] = useState("")
   const [clienteNombre, setClienteNombre] = useState("")
+  const [clienteDireccion, setClienteDireccion] = useState("")
+  const [clienteEstado, setClienteEstado] = useState("")
+  const [clienteCondicion, setClienteCondicion] = useState("")
   const [comprobanteWarning, setComprobanteWarning] = useState<string | null>(null)
   const [showReceipt, setShowReceipt] = useState(false)
   const [lastProcessedOrder, setLastProcessedOrder] = useState<Order | null>(null)
   
+  const completarCliente = useCallback((cliente: ClienteLocal) => {
+    setClienteNombre(cliente.razon_social || cliente.nombre_completo || "")
+    setClienteDireccion(cliente.direccion || "")
+    setClienteEstado(cliente.estado || "")
+    setClienteCondicion(cliente.condicion || "")
+  }, [])
+
+  const notifyDocumentLookup = useCallback((message: string, variant?: "default" | "destructive") => {
+    toast({
+      title: variant === "destructive" ? "Consulta de documento" : message,
+      description: variant === "destructive" ? message : undefined,
+      variant,
+    })
+  }, [toast])
+
+  const { isLookingUp: isLookingUpCliente, statusMessage: clienteLookupMessage } = useDocumentLookup({
+    tipoComprobante,
+    documento: clienteDoc,
+    tenantId: currentStoreId,
+    onCompleted: completarCliente,
+    onMessage: notifyDocumentLookup,
+  })
+
   // Order editing state
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null)
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
@@ -236,6 +264,7 @@ export default function CajaPage() {
               tipoDoc: tipoComprobante === "FACTURA" ? "6" : "1",
               numDoc: clienteDoc.trim(),
               razonSocial: clienteNombre.trim() || "CLIENTE VARIOS",
+              direccion: clienteDireccion.trim() || undefined,
             }
 
       const resultado = await FacturacionService.emitir({
@@ -274,6 +303,9 @@ export default function CajaPage() {
       setTipoComprobante("NOTA_VENTA")
       setClienteDoc("")
       setClienteNombre("")
+      setClienteDireccion("")
+      setClienteEstado("")
+      setClienteCondicion("")
     } catch (error: any) {
       alert(error?.message || "Error al procesar el pago")
     } finally {
@@ -890,13 +922,18 @@ export default function CajaPage() {
                         <label className="text-xs text-muted-foreground">
                           {tipoComprobante === "FACTURA" ? "RUC (11 dígitos)" : "DNI (opcional)"}
                         </label>
-                        <Input
-                          value={clienteDoc}
-                          onChange={(e) => setClienteDoc(e.target.value.replace(/\D/g, ""))}
-                          placeholder={tipoComprobante === "FACTURA" ? "20123456789" : "12345678"}
-                          maxLength={tipoComprobante === "FACTURA" ? 11 : 8}
-                          className="bg-input"
-                        />
+                        <div className="relative">
+                          <Input
+                            value={clienteDoc}
+                            onChange={(e) => setClienteDoc(e.target.value.replace(/\D/g, ""))}
+                            placeholder={tipoComprobante === "FACTURA" ? "20123456789" : "12345678"}
+                            maxLength={tipoComprobante === "FACTURA" ? 11 : 8}
+                            className="bg-input pr-8"
+                          />
+                          {isLookingUpCliente && (
+                            <Spinner className="absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2" />
+                          )}
+                        </div>
                       </div>
                       <div className="space-y-1">
                         <label className="text-xs text-muted-foreground">
@@ -906,9 +943,31 @@ export default function CajaPage() {
                           value={clienteNombre}
                           onChange={(e) => setClienteNombre(e.target.value)}
                           placeholder={tipoComprobante === "FACTURA" ? "Empresa S.A.C." : "Cliente"}
+                          disabled={isLookingUpCliente}
                           className="bg-input"
                         />
                       </div>
+                      <div className="space-y-1 col-span-2">
+                        <label className="text-xs text-muted-foreground">
+                          {tipoComprobante === "FACTURA" ? "Dirección Fiscal" : "Dirección (opcional)"}
+                        </label>
+                        <Input
+                          value={clienteDireccion}
+                          onChange={(e) => setClienteDireccion(e.target.value)}
+                          placeholder={tipoComprobante === "FACTURA" ? "Dirección fiscal" : "Dirección del cliente"}
+                          disabled={isLookingUpCliente}
+                          className="bg-input"
+                        />
+                      </div>
+                      {tipoComprobante === "FACTURA" && (clienteEstado || clienteCondicion) && (
+                        <div className="col-span-2 grid grid-cols-2 gap-3 text-xs text-muted-foreground">
+                          <div>Estado: <span className="font-medium text-foreground">{clienteEstado || "-"}</span></div>
+                          <div>Condición: <span className="font-medium text-foreground">{clienteCondicion || "-"}</span></div>
+                        </div>
+                      )}
+                      {clienteLookupMessage && (
+                        <div className="col-span-2 text-xs text-muted-foreground">{clienteLookupMessage}</div>
+                      )}
                     </div>
                   )}
                 </div>
